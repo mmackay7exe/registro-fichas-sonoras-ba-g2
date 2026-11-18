@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Actividades humanas · Fichas Buenos Aires</title>
+<meta name="theme-color" content="#0B294A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/icon-192.png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="topbar"><div class="wrap">
+  <a class="back" href="index.html" aria-label="Volver al inicio">←</a>
+  <h1>02 · Registro de actividades humanas</h1>
+  <span class="save-status">…</span>
+</div></header>
+
+<div class="timer" data-timer><div class="wrap">
+  <div class="timer-clock mono">00:00</div>
+  <div class="timer-bar"><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i><div class="timer-int"></div></div>
+  <button type="button" class="btn small primary" data-t="start">Iniciar</button>
+  <button type="button" class="btn small accent hidden" data-t="stop">Detener</button>
+  <button type="button" class="btn small ghost hidden" data-t="reset">Reiniciar</button>
+</div></div>
+
+<main class="wrap">
+<form id="f" autocomplete="off" novalidate>
+  <input type="hidden" name="timerStart"><input type="hidden" name="timerEnd">
+
+  <section class="block">
+    <h2 class="sec"><span class="n">01</span>Identificación del registro</h2>
+    <div class="row stack-sm">
+      <div class="field"><label for="codigo">Código de ficha sonora asociada</label>
+        <input type="text" id="codigo" name="codigo" list="dl-sonoras" placeholder="BA-SV-01" autocapitalize="characters"><datalist id="dl-sonoras"></datalist>
+        <p class="hint">Al elegirlo se copian lugar, fecha, observador y horario.</p></div>
+      <div class="field"><label for="observador">Observador/a</label><input type="text" id="observador" name="observador" placeholder="Nombre y apellido" autocapitalize="words"></div>
+    </div>
+    <div class="field"><span class="label">Lugar / punto de observación</span><div data-lugares></div></div>
+    <div class="row-3">
+      <div class="field"><label for="fecha">Fecha</label><input type="date" id="fecha" name="fecha"></div>
+      <div class="field"><label for="horaInicio">Inicio</label><input type="time" id="horaInicio" name="horaInicio"></div>
+      <div class="field"><label for="horaTermino">Término</label><input type="time" id="horaTermino" name="horaTermino"></div>
+    </div>
+    <div class="field" style="max-width:10rem"><label for="duracion">Duración (min)</label><input type="number" inputmode="numeric" id="duracion" name="duracion" value="10"></div>
+  </section>
+
+  <section class="block">
+    <h2 class="sec"><span class="n">02</span>Conteo de movimientos · cada 2 min</h2>
+    <p class="lead small">Define una línea imaginaria (ej.: entre dos fachadas) y cuenta cada cruce de personas y vehículos. No cuentes a quienes permanecen quietos. Con el cronómetro corriendo, cada toque se suma al intervalo en curso.</p>
+
+    <div class="field"><span class="label" id="int-lbl">Intervalo donde se suma</span>
+      <div class="chips sq tight" id="int-chips">
+        <label class="chip"><input type="radio" name="intActivo" value="0" data-skip checked><span>00–02</span></label>
+        <label class="chip"><input type="radio" name="intActivo" value="1" data-skip><span>02–04</span></label>
+        <label class="chip"><input type="radio" name="intActivo" value="2" data-skip><span>04–06</span></label>
+        <label class="chip"><input type="radio" name="intActivo" value="3" data-skip><span>06–08</span></label>
+        <label class="chip"><input type="radio" name="intActivo" value="4" data-skip><span>08–10</span></label>
+      </div>
+    </div>
+
+    <div class="count-pad">
+      <button type="button" data-count="peatones"><span class="big mono" data-show="peatones">0</span><span class="lbl">+ Peatón</span></button>
+      <button type="button" data-count="vehiculos"><span class="big mono" data-show="vehiculos">0</span><span class="lbl">+ Vehículo</span></button>
+      <button type="button" class="minus" data-uncount="peatones">− deshacer peatón</button>
+      <button type="button" class="minus" data-uncount="vehiculos">− deshacer vehículo</button>
+    </div>
+
+    <table class="grid">
+      <thead><tr><th>Intervalo</th><th class="num">Peatones</th><th class="num">Vehículos</th><th>Actividad / nota</th></tr></thead>
+      <tbody id="conteo"></tbody>
+      <tfoot><tr><td>Total</td><td class="num mono" id="tot-p">0</td><td class="num mono" id="tot-v">0</td><td></td></tr></tfoot>
+    </table>
+
+    <div class="field" style="margin-top:1rem"><label for="referenciaLinea">Referencia de la línea de conteo y sentido(s) considerados</label><input type="text" id="referenciaLinea" name="referenciaLinea" placeholder="Ej.: entre farol y kiosco, ambos sentidos"></div>
+  </section>
+
+  <section class="block">
+    <h2 class="sec"><span class="n">03</span>Actividades presentes en el entorno</h2>
+    <p class="lead small">Marca las observadas durante los 10 minutos (pueden ser varias).</p>
+    <div class="chips">
+      <label class="chip"><input type="checkbox" name="actividades" value="Comercio ambulante"><span>Comercio ambulante</span></label>
+      <label class="chip"><input type="checkbox" name="actividades" value="Atención en locales"><span>Atención en locales</span></label>
+      <label class="chip"><input type="checkbox" name="actividades" value="Carga / descarga"><span>Carga / descarga</span></label>
+      <label class="chip"><input type="checkbox" name="actividades" value="Conversaciones"><span>Conversaciones</span></label>
+      <label class="chip"><input type="checkbox" name="actividades" value="Descanso / espera"><span>Descanso / espera</span></label>
+      <label class="chip"><input type="checkbox" name="actividades" value="Trabajo en vía pública"><span>Trabajo en vía pública</span></label>
+      <label class="chip"><input type="checkbox" name="actividades" value="Tránsito peatonal"><span>Tránsito peatonal</span></label>
+      <label class="chip"><input type="checkbox" name="actividades" value="Interacción / juego"><span>Interacción / juego</span></label>
+      <label class="chip"><input type="checkbox" name="actividades" value="Música / espectáculo callejero"><span>Música / espectáculo callejero</span></label>
+      <label class="chip"><input type="checkbox" name="actividades" value="Turismo / fotografía"><span>Turismo / fotografía</span></label>
+    </div>
+    <div class="field" style="margin-top:.6rem"><input type="text" name="actividadOtra" placeholder="Otra actividad"></div>
+  </section>
+
+  <section class="block">
+    <h2 class="sec"><span class="n">04</span>Situaciones destacadas y vínculo con el sonido</h2>
+    <p class="lead small">Un hecho observable, el minuto aproximado y, si corresponde, el sonido asociado.</p>
+    <div data-repeat="situaciones" data-template="tpl-sit" data-min="1" data-label="Situación"></div>
+    <button type="button" class="btn ghost block" data-add="situaciones">+ Agregar situación</button>
+  </section>
+
+  <section class="block">
+    <h2 class="sec"><span class="n">05</span>Observaciones complementarias</h2>
+    <div class="field"><label for="observaciones">Cambios de actividad, aglomeraciones, uso del espacio, dudas o situaciones inesperadas</label><textarea id="observaciones" name="observaciones"></textarea></div>
+    <p class="hint small muted">Usa “NM” si un dato no se pudo medir; escribe 0 solo cuando comprobaste que no hubo cruces.</p>
+  </section>
+</form>
+
+<div class="ficha-foot">
+  <div class="next-steps">
+    <a class="btn primary block" data-next data-tipo="cartografia" href="cartografia.html">Continuar · Cartografía sonora →</a>
+    <a class="btn ghost block" data-next data-tipo="sonora" href="ficha-sonora.html">Ir a · Ficha sonora →</a>
+  </div>
+  <a class="btn ghost block" href="index.html">Volver al inicio</a>
+  <button type="button" class="btn danger block" data-delete>Eliminar ficha</button>
+</div>
+</main>
+
+<template id="tpl-sit"><div class="rep-row">
+  <div class="rep-head"><span class="rep-n"></span><button type="button" class="rep-del" aria-label="Quitar">×</button></div>
+  <div style="display:flex;gap:.6rem;align-items:flex-end"><div class="field" style="width:7rem;margin:0"><span class="label">Minuto</span><input type="number" inputmode="numeric" data-k="minuto" placeholder="0–10"></div><button type="button" class="btn small ghost" data-minuto>Minuto actual</button></div>
+  <div class="field" style="margin:.6rem 0 0"><textarea data-k="desc" placeholder="Actividad / situación y sonido asociado" style="min-height:70px"></textarea></div>
+</div></template>
+
+<script src="assets/js/core.js"></script>
+<script src="assets/js/ficha-comun.js"></script>
+<script src="assets/js/actividades.js"></script>
+</body>
+</html>

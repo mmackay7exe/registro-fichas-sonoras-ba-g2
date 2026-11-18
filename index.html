@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fichas de registro · Buenos Aires</title>
+<meta name="description" content="Registro en terreno del paisaje sonoro · Travesía Coordenadas Portuarias 26 · Grupo 2">
+<meta name="theme-color" content="#0B294A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/icon-192.png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Fichas BA">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="site-head"><div class="wrap">
+  <img class="logo" src="assets/img/logo.webp" alt="Travesía Coordenadas Portuarias 26" width="288" height="126">
+  <div class="head-meta"><div class="net" id="net">En línea</div><div style="margin-top:.3rem">Grupo 2 · e[ad]</div></div>
+</div></header>
+
+<main class="wrap">
+  <h1 class="page-title">Fichas de registro <b>sonoro</b><br>Buenos Aires</h1>
+  <p class="lead">Registro en terreno del paisaje sonoro. Todo se guarda en este teléfono y funciona sin conexión.</p>
+
+  <section class="block" style="padding-top:.4rem">
+    <div class="field" style="margin:0">
+      <label for="yo">Tu nombre (observador/a)</label>
+      <input type="text" id="yo" placeholder="Nombre y apellido" autocapitalize="words" autocomplete="name">
+      <p class="hint" id="yo-hint">Se usa para completar las fichas y sugerir tu código (BA-INICIALES-NN).</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <p class="eyebrow">Nueva ficha</p>
+    <nav class="tipos" aria-label="Tipos de ficha">
+      <a class="tipo" href="ficha-sonora.html"><span class="n">01</span><div><h3>Ficha de observación sonora</h3><p>Fuentes, intensidad, patrón, dB y evaluación del ambiente. Empieza por aquí.</p></div><span class="go">→</span></a>
+      <a class="tipo" href="ficha-actividades.html"><span class="n">02</span><div><h3>Actividades humanas</h3><p>Conteo de peatones y vehículos cada 2 min y actividades del entorno.</p></div><span class="go">→</span></a>
+      <a class="tipo" href="cartografia.html"><span class="n">03</span><div><h3>Cartografía sonora y espacial</h3><p>Croquis con la ubicación de las fuentes y la condición del espacio.</p></div><span class="go">→</span></a>
+    </nav>
+    <a class="guia-link" href="guia.html"><div><b>Guía y procedimiento</b><span class="small muted">Antes de salir, protocolo en terreno, códigos y cómo juntar los datos del grupo.</span></div><span class="go">→</span></a>
+  </section>
+
+  <section class="block">
+    <p class="eyebrow">Registros por lugar</p>
+    <div class="stat-line" id="stats"></div>
+    <div class="filter chips" id="filtro" role="radiogroup" aria-label="Filtrar por lugar"></div>
+    <div id="lista"><div class="empty">Cargando…</div></div>
+  </section>
+
+  <section class="block" id="datos">
+    <p class="eyebrow">Datos</p>
+    <div id="respaldo-aviso"></div>
+    <div class="btn-row" style="margin-bottom:.8rem">
+      <button type="button" class="btn primary" id="exp-json">Respaldo completo</button>
+      <button type="button" class="btn" id="exp-general">Tabla general (CSV)</button>
+    </div>
+    <details>
+      <summary class="small" style="cursor:pointer;padding:.4rem 0">Más exportaciones e importar</summary>
+      <div class="btn-row" style="margin:.8rem 0">
+        <button type="button" class="btn small ghost" id="exp-fuentes">Fuentes (CSV)</button>
+        <button type="button" class="btn small ghost" id="exp-conteos">Conteos (CSV)</button>
+        <button type="button" class="btn small ghost" id="exp-mapa">Cartografía (CSV)</button>
+      </div>
+      <p class="small muted">Para juntar los datos del grupo, importa aquí los respaldos (.json) de cada integrante. Las fichas repetidas no se duplican: se conserva la versión más reciente.</p>
+      <span class="btn small file-btn">Importar respaldo (.json)<input type="file" id="imp" accept=".json,application/json" multiple></span>
+    </details>
+    <p class="small muted" id="storage" style="margin-top:1rem"></p>
+  </section>
+</main>
+
+<footer class="site-foot"><div class="wrap">
+  Taller de Diseño de Servicios · Proyecto de Visualización · Grupo 2 · Travesía Coordenadas Portuarias 26
+</div></footer>
+
+<script src="assets/js/core.js"></script>
+<script src="assets/js/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ficha sonora · Fichas Buenos Aires</title>
+<meta name="theme-color" content="#0B294A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/icon-192.png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="topbar"><div class="wrap">
+  <a class="back" href="index.html" aria-label="Volver al inicio">←</a>
+  <h1>01 · Ficha de observación sonora</h1>
+  <span class="save-status">…</span>
+</div></header>
+
+<div class="timer" data-timer><div class="wrap">
+  <div class="timer-clock mono">00:00</div>
+  <div class="timer-bar"><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i><div class="timer-int"></div></div>
+  <button type="button" class="btn small primary" data-t="start">Iniciar</button>
+  <button type="button" class="btn small accent hidden" data-t="stop">Detener</button>
+  <button type="button" class="btn small ghost hidden" data-t="reset">Reiniciar</button>
+</div></div>
+
+<main class="wrap">
+<form id="f" autocomplete="off" novalidate>
+  <input type="hidden" name="timerStart"><input type="hidden" name="timerEnd">
+
+  <section class="block">
+    <h2 class="sec"><span class="n">01</span>Identificación y contexto</h2>
+    <div class="row stack-sm">
+      <div class="field"><label for="observador">Observador/a</label><input type="text" id="observador" name="observador" placeholder="Nombre y apellido" autocapitalize="words"></div>
+      <div class="field"><label for="codigo">Código de ficha</label>
+        <div style="display:flex;gap:.5rem;align-items:flex-end"><input type="text" id="codigo" name="codigo" placeholder="BA-SV-01" autocapitalize="characters"><button type="button" class="btn small ghost" id="sugerir">Sugerir</button></div>
+      </div>
+    </div>
+    <div class="field"><span class="label">Punto de registro (lugar)</span><div data-lugares></div></div>
+    <div class="field"><label for="referencia">Lugar / calle / referencia</label><input type="text" id="referencia" name="referencia" placeholder="Ej.: esquina Defensa y Humberto 1°, frente al mercado"></div>
+    <div class="row-3">
+      <div class="field"><label for="fecha">Fecha</label><input type="date" id="fecha" name="fecha"></div>
+      <div class="field"><label for="horaInicio">Inicio</label><input type="time" id="horaInicio" name="horaInicio"></div>
+      <div class="field"><label for="horaTermino">Término</label><input type="time" id="horaTermino" name="horaTermino"></div>
+    </div>
+    <div class="field" style="max-width:10rem"><label for="duracion">Duración (min)</label><input type="number" inputmode="numeric" id="duracion" name="duracion" placeholder="10"></div>
+
+    <div class="field"><span class="label">Tipo de espacio</span>
+      <div class="chips">
+        <label class="chip"><input type="checkbox" name="tipoEspacio" value="Calle principal"><span>Calle principal</span></label>
+        <label class="chip"><input type="checkbox" name="tipoEspacio" value="Calle secundaria"><span>Calle secundaria</span></label>
+        <label class="chip"><input type="checkbox" name="tipoEspacio" value="Plaza"><span>Plaza</span></label>
+        <label class="chip"><input type="checkbox" name="tipoEspacio" value="Comercio"><span>Comercio</span></label>
+        <label class="chip"><input type="checkbox" name="tipoEspacio" value="Residencial"><span>Residencial</span></label>
+        <label class="chip"><input type="checkbox" name="tipoEspacio" value="Paradero / transporte"><span>Paradero / transporte</span></label>
+        <label class="chip"><input type="checkbox" name="tipoEspacio" value="Borde costero / río"><span>Borde costero / río</span></label>
+      </div>
+      <input type="text" name="tipoEspacioOtro" placeholder="Otro tipo de espacio" style="margin-top:.4rem">
+    </div>
+    <div class="row stack-sm">
+      <div class="field"><span class="label">Clima</span><div class="chips">
+        <label class="chip"><input type="radio" name="clima" value="Soleado"><span>Soleado</span></label>
+        <label class="chip"><input type="radio" name="clima" value="Nublado"><span>Nublado</span></label>
+        <label class="chip"><input type="radio" name="clima" value="Lluvia"><span>Lluvia</span></label>
+      </div></div>
+      <div class="field"><span class="label">Viento</span><div class="chips">
+        <label class="chip"><input type="radio" name="viento" value="Bajo"><span>Bajo</span></label>
+        <label class="chip"><input type="radio" name="viento" value="Medio"><span>Medio</span></label>
+        <label class="chip"><input type="radio" name="viento" value="Alto"><span>Alto</span></label>
+      </div></div>
+    </div>
+    <div class="row stack-sm">
+      <div class="field"><span class="label">Flujo de personas</span><div class="chips">
+        <label class="chip"><input type="radio" name="flujoPersonas" value="Bajo"><span>Bajo</span></label>
+        <label class="chip"><input type="radio" name="flujoPersonas" value="Medio"><span>Medio</span></label>
+        <label class="chip"><input type="radio" name="flujoPersonas" value="Alto"><span>Alto</span></label>
+      </div></div>
+      <div class="field"><span class="label">Flujo vehicular</span><div class="chips">
+        <label class="chip"><input type="radio" name="flujoVehicular" value="Bajo"><span>Bajo</span></label>
+        <label class="chip"><input type="radio" name="flujoVehicular" value="Medio"><span>Medio</span></label>
+        <label class="chip"><input type="radio" name="flujoVehicular" value="Alto"><span>Alto</span></label>
+      </div></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="sec"><span class="n">02</span>Registro de fuentes sonoras</h2>
+    <p class="lead small">Un sonido por fila. Usa <b>+1</b> cada vez que ocurra; si es continuo, anota los minutos que dura.</p>
+    <div data-repeat="fuentes" data-template="tpl-fuente" data-min="1" data-label="Fuente"></div>
+    <button type="button" class="btn ghost block" data-add="fuentes">+ Agregar fuente</button>
+
+    <div class="field" style="margin-top:1.2rem"><label for="predominante">Sonido predominante</label>
+      <input type="text" id="predominante" name="predominante" list="dl-fuentes" placeholder="Elige de la lista o escribe"><datalist id="dl-fuentes"></datalist></div>
+
+    <span class="label" style="margin-top:1.2rem">Medición instrumental (dB)</span>
+    <div class="row-3">
+      <div class="field"><label for="dbMin">Mín.</label><input type="number" inputmode="decimal" step="0.1" id="dbMin" name="dbMin"></div>
+      <div class="field"><label for="dbProm">Prom.</label><input type="number" inputmode="decimal" step="0.1" id="dbProm" name="dbProm"></div>
+      <div class="field"><label for="dbMax">Máx.</label><input type="number" inputmode="decimal" step="0.1" id="dbMax" name="dbMax"></div>
+    </div>
+    <div class="row stack-sm" style="align-items:end">
+      <div class="field"><label for="equipo">Equipo / aplicación</label><input type="text" id="equipo" name="equipo" placeholder="Ej.: Decibel X"></div>
+      <div class="field"><label class="chip"><input type="checkbox" name="noMedido"><span>No se midió (NM)</span></label></div>
+    </div>
+    <p class="hint small muted">Tipo: H humana · V vehicular · C comercial · N natural · M mecánica · O otra. — Patrón: P puntual · I intermitente · C continuo.</p>
+  </section>
+
+  <section class="block">
+    <h2 class="sec"><span class="n">03</span>Evaluación general del ambiente</h2>
+    <p class="hint small muted" style="margin-top:-.5rem">1 = mínimo / muy desagradable / muy difícil · 5 = máximo / muy agradable / muy fácil</p>
+    <div class="field"><span class="label">Intensidad general</span><div class="chips scale" data-scale="evIntensidad"></div></div>
+    <div class="field"><span class="label">Diversidad de sonidos</span><div class="chips scale" data-scale="evDiversidad"></div></div>
+    <div class="field"><span class="label">Agrado del ambiente</span><div class="chips scale" data-scale="evAgrado"></div></div>
+    <div class="field"><span class="label">Facilidad de distinguir</span><div class="chips scale" data-scale="evFacilidad"></div></div>
+  </section>
+
+  <section class="block">
+    <h2 class="sec"><span class="n">04</span>Situaciones sonoras destacadas</h2>
+    <p class="lead small">¿Qué sonido llamó la atención? ¿Hubo un cambio repentino, superposición o silencio? Describe de forma objetiva.</p>
+    <div data-repeat="situaciones" data-template="tpl-sit" data-min="1" data-label="Situación"></div>
+    <button type="button" class="btn ghost block" data-add="situaciones">+ Agregar situación</button>
+  </section>
+
+  <section class="block">
+    <h2 class="sec"><span class="n">05</span>Sonido, espacio y personas</h2>
+    <p class="lead small">¿De dónde provenía? ¿Era fijo o se desplazaba? ¿Hubo reacciones visibles?</p>
+    <div class="field"><label for="hechos">Hechos observables (evitar suposiciones)</label><textarea id="hechos" name="hechos"></textarea></div>
+    <div class="field"><label for="interpretacion">Interpretación o hipótesis (separada de los hechos)</label><textarea id="interpretacion" name="interpretacion"></textarea></div>
+  </section>
+
+  <section class="block">
+    <h2 class="sec"><span class="n">06</span>Bitácora libre y registro complementario</h2>
+    <div class="field"><label for="bitacora">Hallazgos imprevistos, direcciones de fuentes, barreras físicas, cambios</label><textarea id="bitacora" name="bitacora"></textarea></div>
+    <div class="field"><span class="label">Registro complementario</span><div class="chips">
+      <label class="chip"><input type="checkbox" name="complementario" value="Foto"><span>Foto</span></label>
+      <label class="chip"><input type="checkbox" name="complementario" value="Audio"><span>Audio</span></label>
+      <label class="chip"><input type="checkbox" name="complementario" value="Video"><span>Video</span></label>
+      <label class="chip"><input type="checkbox" name="complementario" value="Ninguno"><span>Ninguno</span></label>
+    </div></div>
+    <div class="field"><label for="codigosArchivo">Código(s) de archivo</label><input type="text" id="codigosArchivo" name="codigosArchivo" placeholder="Ej.: AUD_0034, IMG_2211"></div>
+    <div class="field" data-fotos><span class="label">Fotos (se guardan en el teléfono)</span>
+      <span class="btn ghost file-btn">+ Agregar foto<input type="file" accept="image/*" multiple aria-label="Agregar foto"></span>
+      <div class="fotos"></div>
+    </div>
+    <div class="field"><label for="pregunta">Observación / pregunta para revisar en equipo</label><textarea id="pregunta" name="pregunta" style="min-height:70px"></textarea></div>
+  </section>
+</form>
+
+<div class="ficha-foot">
+  <div class="next-steps">
+    <a class="btn primary block" data-next data-tipo="actividades" href="ficha-actividades.html">Continuar · Actividades humanas →</a>
+    <a class="btn ghost block" data-next data-tipo="cartografia" href="cartografia.html">Continuar · Cartografía sonora →</a>
+  </div>
+  <a class="btn ghost block" href="index.html">Volver al inicio</a>
+  <button type="button" class="btn danger block" data-delete>Eliminar ficha</button>
+</div>
+</main>
+
+<template id="tpl-fuente"><div class="rep-row">
+  <div class="rep-head"><span class="rep-n"></span><button type="button" class="rep-del" aria-label="Quitar fuente">×</button></div>
+  <div class="field" style="margin-bottom:.4rem"><input type="text" data-k="sonido" placeholder="Sonido / fuente (ej.: bocinazo de colectivo)"></div>
+  <div class="sub"><span class="label">Tipo</span><div class="chips sq tight">
+    <label class="chip" title="Humana"><input type="radio" data-k="tipo" value="H"><span>H</span></label>
+    <label class="chip" title="Vehicular"><input type="radio" data-k="tipo" value="V"><span>V</span></label>
+    <label class="chip" title="Comercial"><input type="radio" data-k="tipo" value="C"><span>C</span></label>
+    <label class="chip" title="Natural"><input type="radio" data-k="tipo" value="N"><span>N</span></label>
+    <label class="chip" title="Mecánica"><input type="radio" data-k="tipo" value="M"><span>M</span></label>
+    <label class="chip" title="Otra"><input type="radio" data-k="tipo" value="O"><span>O</span></label>
+  </div></div>
+  <div class="sub"><span class="label">Intensidad</span><div class="chips sq tight">
+    <label class="chip"><input type="radio" data-k="intensidad" value="1"><span>1</span></label>
+    <label class="chip"><input type="radio" data-k="intensidad" value="2"><span>2</span></label>
+    <label class="chip"><input type="radio" data-k="intensidad" value="3"><span>3</span></label>
+    <label class="chip"><input type="radio" data-k="intensidad" value="4"><span>4</span></label>
+    <label class="chip"><input type="radio" data-k="intensidad" value="5"><span>5</span></label>
+  </div></div>
+  <div class="sub"><span class="label">Patrón</span><div class="chips sq tight">
+    <label class="chip"><input type="radio" data-k="patron" value="P"><span>Puntual</span></label>
+    <label class="chip"><input type="radio" data-k="patron" value="I"><span>Intermit.</span></label>
+    <label class="chip"><input type="radio" data-k="patron" value="C"><span>Continuo</span></label>
+  </div></div>
+  <div class="sub"><span class="label">Eventos</span><div class="counter">
+    <button type="button" class="btn small ghost" data-step="-1" aria-label="Restar uno">−</button>
+    <input type="number" inputmode="numeric" min="0" data-k="eventos" placeholder="0">
+    <button type="button" class="btn small primary" data-step="1">+1</button>
+  </div></div>
+</div></template>
+
+<template id="tpl-sit"><div class="rep-row">
+  <div class="rep-head"><span class="rep-n"></span><button type="button" class="rep-del" aria-label="Quitar">×</button></div>
+  <div style="display:flex;gap:.6rem;align-items:flex-end"><div class="field" style="flex:1;margin:0"><span class="label">Hora aprox.</span><input type="time" data-k="hora"></div><button type="button" class="btn small ghost" data-now>Ahora</button></div>
+  <div class="field" style="margin:.6rem 0 0"><textarea data-k="desc" placeholder="Descripción objetiva" style="min-height:70px"></textarea></div>
+</div></template>
+
+<script src="assets/js/core.js"></script>
+<script src="assets/js/ficha-comun.js"></script>
+<script src="assets/js/sonora.js"></script>
+</body>
+</html>

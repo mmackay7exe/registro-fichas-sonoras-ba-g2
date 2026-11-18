@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cartografía sonora · Fichas Buenos Aires</title>
+<meta name="theme-color" content="#0B294A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/img/icon-192.png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="topbar"><div class="wrap">
+  <a class="back" href="index.html" aria-label="Volver al inicio">←</a>
+  <h1>03 · Cartografía sonora y espacial</h1>
+  <span class="save-status">…</span>
+</div></header>
+
+<main class="wrap">
+<form id="f" autocomplete="off" novalidate>
+  <input type="hidden" name="croquis">
+
+  <section class="block">
+    <h2 class="sec"><span class="n">01</span>Identificación</h2>
+    <div class="row stack-sm">
+      <div class="field"><label for="codigo">Código de ficha sonora asociada</label>
+        <input type="text" id="codigo" name="codigo" list="dl-sonoras" placeholder="BA-SV-01" autocapitalize="characters"><datalist id="dl-sonoras"></datalist></div>
+      <div class="field"><label for="observador">Observador/a</label><input type="text" id="observador" name="observador" placeholder="Nombre y apellido" autocapitalize="words"></div>
+    </div>
+    <div class="field"><span class="label">Lugar</span><div data-lugares></div></div>
+    <div class="row">
+      <div class="field"><label for="fecha">Fecha</label><input type="date" id="fecha" name="fecha"></div>
+      <div class="field"><label for="horaInicio">Hora</label><input type="time" id="horaInicio" name="horaInicio"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="sec"><span class="n">02</span>Croquis sonoro</h2>
+    <p class="lead small">Tú estás al centro, mirando hacia arriba (“frente”). En <b>Fuente</b>, elige el tipo y toca donde está el sonido; arrastra un punto para moverlo. En <b>Dibujar</b>, traza bordes, fachadas, calles o recorridos.</p>
+    <div class="field"><label for="orientacion">¿Hacia dónde mira el observador?</label><input type="text" id="orientacion" name="orientacion" placeholder="Ej.: hacia el río / hacia Casa Rosada"></div>
+
+    <div class="sketch-tools">
+      <div class="chips sq tight">
+        <label class="chip"><input type="radio" name="modo" value="fuente" data-skip checked><span>Fuente</span></label>
+        <label class="chip"><input type="radio" name="modo" value="dibujo" data-skip><span>Dibujar</span></label>
+      </div>
+      <span style="flex:1"></span>
+      <button type="button" class="btn small ghost" id="undo">Deshacer</button>
+      <button type="button" class="btn small ghost" id="clear">Limpiar</button>
+    </div>
+    <div class="chips sq tight" id="tipo-fuente" style="margin-bottom:.6rem"></div>
+    <div class="sketch-wrap"><canvas id="cv" aria-label="Croquis sonoro: toca para ubicar fuentes"></canvas></div>
+    <div class="sketch-legend" id="legend"></div>
+    <div class="btn-row" style="margin-top:.7rem"><button type="button" class="btn small ghost" id="png">Guardar imagen del croquis</button></div>
+  </section>
+
+  <section class="block">
+    <h2 class="sec"><span class="n">03</span>Ubicación de las fuentes</h2>
+    <p class="lead small">Se crea una fila por cada punto del croquis. La dirección se calcula sola según dónde lo ubicaste.</p>
+    <div id="fuentes-mapa"></div>
+    <div class="empty" id="fm-empty">Aún no hay fuentes en el croquis.</div>
+  </section>
+
+  <section class="block">
+    <h2 class="sec"><span class="n">04</span>Condición espacial</h2>
+    <div class="field"><span class="label">Amplitud</span><div class="chips">
+      <label class="chip"><input type="radio" name="amplitud" value="Estrecho"><span>Estrecho</span></label>
+      <label class="chip"><input type="radio" name="amplitud" value="Medio"><span>Medio</span></label>
+      <label class="chip"><input type="radio" name="amplitud" value="Amplio"><span>Amplio</span></label>
+    </div></div>
+    <div class="field"><span class="label">Bordes</span><div class="chips">
+      <label class="chip"><input type="radio" name="bordes" value="Abierto"><span>Abierto</span></label>
+      <label class="chip"><input type="radio" name="bordes" value="Semiabierto"><span>Semiabierto</span></label>
+      <label class="chip"><input type="radio" name="bordes" value="Cerrado / continuo"><span>Cerrado / continuo</span></label>
+    </div></div>
+    <div class="field"><span class="label">Pavimento</span><div class="chips">
+      <label class="chip"><input type="checkbox" name="pavimento" value="Adoquín"><span>Adoquín</span></label>
+      <label class="chip"><input type="checkbox" name="pavimento" value="Asfalto"><span>Asfalto</span></label>
+      <label class="chip"><input type="checkbox" name="pavimento" value="Baldosa"><span>Baldosa</span></label>
+      <label class="chip"><input type="checkbox" name="pavimento" value="Hormigón"><span>Hormigón</span></label>
+      <label class="chip"><input type="checkbox" name="pavimento" value="Madera / deck"><span>Madera / deck</span></label>
+      <label class="chip"><input type="checkbox" name="pavimento" value="Tierra / pasto"><span>Tierra / pasto</span></label>
+    </div></div>
+    <div class="field"><span class="label">Vegetación</span><div class="chips">
+      <label class="chip"><input type="radio" name="vegetacion" value="Nula"><span>Nula</span></label>
+      <label class="chip"><input type="radio" name="vegetacion" value="Escasa"><span>Escasa</span></label>
+      <label class="chip"><input type="radio" name="vegetacion" value="Media"><span>Media</span></label>
+      <label class="chip"><input type="radio" name="vegetacion" value="Abundante"><span>Abundante</span></label>
+    </div></div>
+    <div class="field"><label for="fachadas">Fachadas (materialidad, altura, continuidad)</label><input type="text" id="fachadas" name="fachadas" placeholder="Ej.: fachadas continuas de 3–4 pisos, ladrillo y revoque"></div>
+    <div class="field"><label for="barreras">Barreras u obstáculos acústicos</label><input type="text" id="barreras" name="barreras" placeholder="Ej.: rejas, toldos, árboles, muros"></div>
+    <div class="field"><label for="notas">Notas espaciales</label><textarea id="notas" name="notas"></textarea></div>
+    <div class="field" data-fotos><span class="label">Fotos del lugar</span>
+      <span class="btn ghost file-btn">+ Agregar foto<input type="file" accept="image/*" multiple aria-label="Agregar foto"></span>
+      <div class="fotos"></div>
+    </div>
+  </section>
+</form>
+
+<div class="ficha-foot">
+  <div class="next-steps">
+    <a class="btn ghost block" data-next data-tipo="sonora" href="ficha-sonora.html">Ir a · Ficha sonora →</a>
+    <a class="btn ghost block" data-next data-tipo="actividades" href="ficha-actividades.html">Ir a · Actividades humanas →</a>
+  </div>
+  <a class="btn primary block" href="index.html">Listo · Volver al inicio</a>
+  <button type="button" class="btn danger block" data-delete>Eliminar ficha</button>
+</div>
+</main>
+
+<script src="assets/js/core.js"></script>
+<script src="assets/js/ficha-comun.js"></script>
+<script src="assets/js/cartografia.js"></script>
+</body>
+</html>
