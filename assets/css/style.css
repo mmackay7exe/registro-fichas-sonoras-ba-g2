@@ -124,6 +124,9 @@ input::placeholder,textarea::placeholder{color:#A6ADB5}
 .reg-top{display:flex;justify-content:space-between;gap:.6rem;align-items:baseline}
 .reg-code{white-space:nowrap;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .reg-meta{font-size:.82rem;color:var(--muted)}
+.origen{display:inline-block;margin-left:.45rem;padding:.05rem .4rem;font-size:.66rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;vertical-align:middle;border:1px solid var(--navy);color:var(--navy);border-radius:var(--radius)}
+.origen.reconstruido{border-style:dashed;border-color:var(--terra);color:var(--terra)}
+p .origen{margin-left:0}
 .pills{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.55rem}
 .pill{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;padding:.35rem .65rem;border:1px solid var(--line);border-radius:999px;text-decoration:none;min-height:34px}
 .pill.done{border-color:var(--navy);color:var(--navy)}
@@ -223,4 +226,3 @@ table.grid .num input{text-align:center}
 
 #referencias table.grid td{padding:.5rem .3rem;font-size:.84rem;vertical-align:top}
 #referencias sup{color:var(--terra)}
-#simulados .reg-code{color:var(--muted)}

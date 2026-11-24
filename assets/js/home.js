@@ -25,8 +25,8 @@ function agrupar(recs){
 }
 function ordenLugares(grupos,lugares){ return [...lugares.filter(l=>grupos[l]),...Object.keys(grupos).filter(l=>!lugares.includes(l))]; }
 
-/* Lista por lugar. sim=true: enlaces de solo lectura y sin crear fichas nuevas */
-function htmlLista(grupos,orden,sim){
+/* Lista por lugar. reg=true: registros del grupo, enlaces de solo lectura y sin crear fichas nuevas */
+function htmlLista(grupos,orden,reg){
   return orden.map(l=>{
     const info=FB.lugarInfo(l);
     const regs=Object.values(grupos[l]).map(g=>{
@@ -40,13 +40,13 @@ function htmlLista(grupos,orden,sim){
         const meta=[FB.fechaLarga(g.any.fecha),d.horaInicio,g.any.observador].filter(Boolean).join(' · ');
         const pills=Object.entries(FB.TIPOS).map(([t,T])=>{
           const r=g.items[t];
-          if(r) return `<a class="pill done" href="${T.url}?${sim?'sim':'id'}=${r.id}">${T.corto}</a>`;
-          if(sim) return '';
+          if(r) return `<a class="pill done" href="${T.url}?${reg?'reg':'id'}=${r.id}">${T.corto}</a>`;
+          if(reg) return '';
           const q=`?codigo=${encodeURIComponent(g.codigo||'')}&lugar=${encodeURIComponent(l==='Sin lugar'?'':l)}`;
           return `<a class="pill todo" href="${T.url}${q}">${T.corto}</a>`;
         }).join('');
         const extra=g.items.sonora&&d.dbProm?` · ${esc(d.dbProm)} dB prom.`:'';
-        return `<div class="reg"><div class="reg-top"><span class="reg-code">${esc(g.codigo||'Sin código')}</span><span class="reg-meta">${esc(meta)}${extra}</span></div><div class="pills">${pills}</div></div>`;
+        return `<div class="reg"><div class="reg-top"><span class="reg-code">${esc(g.codigo||'Sin código')}${FB.etiquetaOrigen(g.any.origen)}</span><span class="reg-meta">${esc(meta)}${extra}</span></div><div class="pills">${pills}</div></div>`;
       }).join('')}
     </div>`;
   }).join('');
@@ -75,12 +75,15 @@ async function render(){
     : `<div class="notice ok">Todo respaldado · ${new Date(last).toLocaleString('es-CL',{dateStyle:'short',timeStyle:'short'})}</div>`;
 }
 
-/* Datos simulados: se muestran aparte y no se suman a los registros */
-async function renderSim(){
-  const sims=await FB.simulados();
-  if(!sims.length){ $('#lista-sim').innerHTML='<div class="empty">No se pudieron cargar los datos simulados.</div>'; return; }
-  const lugares=await FB.lugaresTodos(); const g=agrupar(sims);
-  $('#lista-sim').innerHTML=htmlLista(g,ordenLugares(g,lugares),true);
+/* Registros recopilados en Buenos Aires (archivo del grupo, solo lectura) */
+async function renderRegistros(){
+  const regs=await FB.registrosBA();
+  if(!regs.length){ $('#lista-ba').innerHTML='<div class="empty">No se pudieron cargar los registros.</div>'; return; }
+  const lugares=await FB.lugaresTodos(); const g=agrupar(regs);
+  const porCodigo={}; regs.forEach(r=>{ porCodigo[r.codigo]=r.origen||'terreno'; });
+  const n=o=>Object.values(porCodigo).filter(x=>x===o).length;
+  $('#stats-ba').innerHTML=`<span><b>${Object.keys(porCodigo).length}</b>registros</span><span><b>${n('terreno')}</b>terreno</span><span><b>${n('reconstruido')}</b>reconstruidos</span><span><b>${Object.keys(g).length}</b>lugares</span>`;
+  $('#lista-ba').innerHTML=htmlLista(g,ordenLugares(g,lugares),true);
 }
 
 $('#filtro').addEventListener('change',e=>{ filtro=e.target.value; FB.settings.set({filtro}); render(); });
@@ -98,7 +101,7 @@ async function csv(fn,cols,nombre,fuente){
 $('#exp-general').addEventListener('click',()=>csv(FB.tablaGeneral,FB.COLS_GENERAL,`tabla-general_BA_${quien()}`));
 $('#exp-fuentes').addEventListener('click',()=>csv(FB.tablaFuentes,FB.COLS_FUENTES,`fuentes_BA_${quien()}`));
 $('#exp-conteos').addEventListener('click',()=>csv(FB.tablaConteos,FB.COLS_CONTEOS,`conteos_BA_${quien()}`));
-$('#exp-sim').addEventListener('click',()=>csv(FB.tablaGeneral,FB.COLS_GENERAL,'tabla-general_BA_simulado-prototipo',FB.simulados));
+$('#exp-ba').addEventListener('click',()=>csv(FB.tablaGeneral,FB.COLS_GENERAL,'tabla-general_BA_registros-grupo2',FB.registrosBA));
 $('#exp-json').addEventListener('click',async()=>{
   const recs=await FB.db.all(); if(!recs.length){FB.toast('No hay fichas para respaldar');return;}
   const data=await FB.respaldo();
@@ -127,6 +130,6 @@ $('#imp').addEventListener('change',async e=>{
   }catch(e){}
 })();
 
-render(); renderSim();
+render(); renderRegistros();
 window.addEventListener('pageshow',e=>{ if(e.persisted) render(); });
 })();

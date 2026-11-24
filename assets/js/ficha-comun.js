@@ -36,10 +36,10 @@ FB.updateNext = rec=>{
   $$('[data-next]').forEach(a=>{ a.href=a.dataset.next+q; });
 };
 FB.wireNext = async rec=>{
-  if(FB.page&&FB.page.sim){
-    const sims=rec?(await FB.simulados()).filter(r=>r.codigo===rec.codigo):[];
-    $$('[data-next]').forEach(a=>{ const ex=sims.find(r=>r.tipo===a.dataset.tipo);
-      if(ex){ a.href=`${FB.TIPOS[ex.tipo].url}?sim=${ex.id}`; a.textContent=`Ver · ${FB.TIPOS[ex.tipo].nombre} →`; } else a.classList.add('hidden'); });
+  if(FB.page&&FB.page.reg){
+    const regs=rec?(await FB.registrosBA()).filter(r=>r.codigo===rec.codigo):[];
+    $$('[data-next]').forEach(a=>{ const ex=regs.find(r=>r.tipo===a.dataset.tipo);
+      if(ex){ a.href=`${FB.TIPOS[ex.tipo].url}?reg=${ex.id}`; a.textContent=`Ver · ${FB.TIPOS[ex.tipo].nombre} →`; } else a.classList.add('hidden'); });
     return;
   }
   // si ya existe la ficha enlazada, abrirla en vez de crear otra

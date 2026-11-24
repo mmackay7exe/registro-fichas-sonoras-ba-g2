@@ -1,9 +1,9 @@
 /* Service worker: guarda la app completa para usarla sin conexión.
    Cambia VERSION cada vez que publiques cambios para que los teléfonos se actualicen. */
-const VERSION = 'fichas-ba-v2';
+const VERSION = 'fichas-ba-v3';
 const ARCHIVOS = [
   './', 'index.html', 'ficha-sonora.html', 'ficha-actividades.html', 'guia.html',
-  'manifest.webmanifest', 'data/simulado-prototipo.json',
+  'manifest.webmanifest', 'data/registros-ba.json',
   'assets/css/style.css',
   'assets/js/core.js', 'assets/js/ficha-comun.js', 'assets/js/home.js',
   'assets/js/sonora.js', 'assets/js/actividades.js',
