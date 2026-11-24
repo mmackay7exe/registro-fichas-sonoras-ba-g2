@@ -15,9 +15,9 @@ FB.LUGARES = [
 ];
 FB.TIPOS = {
   sonora:      {nombre:'Ficha sonora',            corto:'Sonora',       url:'ficha-sonora.html',      n:'01'},
-  actividades: {nombre:'Actividades humanas',     corto:'Actividades',  url:'ficha-actividades.html', n:'02'},
-  cartografia: {nombre:'Cartografía sonora',      corto:'Cartografía',  url:'cartografia.html',       n:'03'}
+  actividades: {nombre:'Actividades humanas',     corto:'Actividades',  url:'ficha-actividades.html', n:'02'}
 };
+FB.SIM_URL = 'data/simulado-prototipo.json';
 FB.FUENTE_TIPOS = {H:'Humana',V:'Vehicular',C:'Comercial',N:'Natural',M:'Mecánica',O:'Otra'};
 FB.FUENTE_COLORES = {H:'#B3624E',V:'#0B294A',C:'#C9962B',N:'#2E7D5B',M:'#6B7480',O:'#8A5BA6'};
 
@@ -97,6 +97,20 @@ FB.db = {
     byFicha: async fid=>req((await os('media')).index('fichaId').getAll(fid)),
     all: async ()=>req((await os('media')).getAll())
   }
+};
+
+/* La cartografía no se usó en Argentina: se borran las fichas de ese tipo que queden guardadas */
+FB.limpiarCartografia = async ()=>{
+  try{ const old=(await FB.db.all()).filter(r=>r.tipo==='cartografia'); for(const r of old) await FB.db.del(r.id); return old.length; }catch(e){ return 0; }
+};
+
+/* Datos simulados para el prototipo (archivo aparte, solo lectura) */
+let _sim;
+FB.simulados = async ()=>{
+  if(_sim) return _sim;
+  try{ const r=await fetch(FB.SIM_URL); const j=await r.json(); _sim=(j.fichas||[]).filter(f=>FB.TIPOS[f.tipo]); }
+  catch(e){ _sim=[]; }
+  return _sim;
 };
 
 /* Pide al navegador que no borre los datos si falta espacio */
@@ -223,10 +237,11 @@ FB.timer = function(el,form,onChange){
     bars.forEach((b,i)=>{const fill=Math.max(0,Math.min(1,(t-i*120)/120)); b.firstElementChild.style.width=(fill*100)+'%'; b.classList.toggle('cur',run&&i===cur&&t<DUR);});
     el.classList.toggle('running',run); el.classList.toggle('done',t>=DUR);
     lbl.textContent = !+start.value ? 'Toca iniciar al comenzar la observación' : t>=DUR ? 'Observación de 10 min completa' : run ? `Intervalo ${FB.pad(cur*2)}–${FB.pad(cur*2+2)} min` : 'En pausa / detenido';
-    bStart.classList.toggle('hidden',!!+start.value); bStop.classList.toggle('hidden',!run); bReset.classList.toggle('hidden',!+start.value||run);
+    const ro=FB.page&&FB.page.sim;
+    bStart.classList.toggle('hidden',ro||!!+start.value); bStop.classList.toggle('hidden',ro||!run); bReset.classList.toggle('hidden',ro||!+start.value||run);
     api.interval=()=> (+start.value && t<DUR) ? cur : -1;
     api.running=()=>run;
-    if(run&&t>=DUR&&!notified){
+    if(run&&t>=DUR&&!notified&&!ro){
       notified=true; try{navigator.vibrate&&navigator.vibrate([200,100,200]);}catch(e){}
       end.value=String(+start.value+DUR*1000);
       setIf('horaTermino',FB.hora(new Date(+end.value)));
@@ -290,9 +305,24 @@ FB.fotos = function(cont,ensureId){
    guarda inmediatamente al salir de la página. */
 FB.ficha = async function({tipo, form, onLoad, onSerialize, onAfterSave}){
   const status=FB.$('.save-status');
-  const page=FB.page={id:FB.params.get('id')||null, rec:null, dirty:false};
-  let timer;
   const setStatus=(t,cls='')=>{if(status){status.textContent=t;status.className='save-status '+cls;}};
+  const simId=FB.params.get('sim');
+  const page=FB.page={id:FB.params.get('id')||null, rec:null, dirty:false, sim:!!simId};
+  if(simId){
+    page.rec=(await FB.simulados()).find(r=>r.id===simId)||null;
+    if(page.rec){
+      FB.form.fill(form,page.rec.data||{});
+      FB.$$('input,textarea,select,button',form).forEach(el=>el.disabled=true);
+      FB.$$('[data-timer] button,[data-delete],[data-add],.file-btn').forEach(el=>el.classList.add('hidden'));
+      const n=document.createElement('div'); n.className='notice'; n.style.marginTop='1rem'; n.textContent='Datos simulados para el prototipo';
+      FB.$('main').prepend(n);
+      setStatus('Solo lectura');
+      page.touch=()=>{}; page.save=async()=>{}; page.ensureId=async()=>null;
+      onLoad&&await onLoad(page.rec);
+      return page;
+    }
+  }
+  let timer;
 
   async function save(){
     clearTimeout(timer);
@@ -406,10 +436,10 @@ const suma=(arr,k)=>(arr||[]).reduce((s,x)=>s+(parseInt(x&&x[k])||0),0);
 /* Tabla general: una fila por código de registro, combinando las 3 fichas */
 FB.tablaGeneral = recs=>{
   const by={};
-  recs.forEach(r=>{const k=r.codigo||('sin-codigo-'+r.id); (by[k]=by[k]||{codigo:r.codigo})[r.tipo]=r;});
+  recs.filter(r=>FB.TIPOS[r.tipo]).forEach(r=>{const k=r.codigo||('sin-codigo-'+r.id); (by[k]=by[k]||{codigo:r.codigo})[r.tipo]=r;});
   return Object.values(by).map(g=>{
-    const s=g.sonora&&g.sonora.data||{}, a=g.actividades&&g.actividades.data||{}, c=g.cartografia&&g.cartografia.data||{};
-    const any=g.sonora||g.actividades||g.cartografia;
+    const s=g.sonora&&g.sonora.data||{}, a=g.actividades&&g.actividades.data||{};
+    const any=g.sonora||g.actividades;
     const lugar=any.lugar; const info=FB.lugarInfo(lugar)||{};
     const fuentes=(s.fuentes||[]).filter(f=>f&&f.sonido);
     const tipos=[...new Set(fuentes.map(f=>f.tipo).filter(Boolean))];
@@ -423,12 +453,11 @@ FB.tablaGeneral = recs=>{
       nFuentes:fuentes.length||'', tiposFuentes:tipos.join(' '), eventos:suma(fuentes,'eventos')||'',
       peatones:a.conteo?suma(a.conteo,'peatones'):'', vehiculos:a.conteo?suma(a.conteo,'vehiculos'):'',
       actividades:[...(a.actividades||[]),a.actividadOtra].filter(Boolean),
-      amplitud:c.amplitud||'', bordes:c.bordes||'', pavimento:c.pavimento||[], vegetacion:c.vegetacion||'',
-      fichas:['sonora','actividades','cartografia'].filter(t=>g[t]).join(' ')
+      fichas:['sonora','actividades'].filter(t=>g[t]).join(' ')
     };
   }).sort((x,y)=>(x.fecha+x.horaInicio).localeCompare(y.fecha+y.horaInicio));
 };
-FB.COLS_GENERAL=[['Ciudad','ciudad'],['Código','codigo'],['Fecha','fecha'],['Hora inicio','horaInicio'],['Hora término','horaTermino'],['Lugar','lugar'],['Zona','zona'],['Homólogo Valparaíso','homologo'],['Observador/a','observador'],['Referencia','referencia'],['Tipo de espacio','tipoEspacio'],['Clima','clima'],['Viento','viento'],['Fuente predominante','predominante'],['dB mín','dbMin'],['dB prom','dbProm'],['dB máx','dbMax'],['Equipo / app','equipo'],['No se midió','noMedido'],['Flujo personas','flujoPersonas'],['Flujo vehicular','flujoVehicular'],['Intensidad (1-5)','intensidad'],['Diversidad (1-5)','diversidad'],['Agrado (1-5)','agrado'],['Facilidad distinguir (1-5)','facilidad'],['N.º fuentes','nFuentes'],['Tipos de fuentes','tiposFuentes'],['N.º eventos','eventos'],['Peatones (10 min)','peatones'],['Vehículos (10 min)','vehiculos'],['Actividades','actividades'],['Amplitud','amplitud'],['Bordes','bordes'],['Pavimento','pavimento'],['Vegetación','vegetacion'],['Fichas completadas','fichas']];
+FB.COLS_GENERAL=[['Ciudad','ciudad'],['Código','codigo'],['Fecha','fecha'],['Hora inicio','horaInicio'],['Hora término','horaTermino'],['Lugar','lugar'],['Zona','zona'],['Homólogo Valparaíso','homologo'],['Observador/a','observador'],['Referencia','referencia'],['Tipo de espacio','tipoEspacio'],['Clima','clima'],['Viento','viento'],['Fuente predominante','predominante'],['dB mín','dbMin'],['dB prom','dbProm'],['dB máx','dbMax'],['Equipo / app','equipo'],['No se midió','noMedido'],['Flujo personas','flujoPersonas'],['Flujo vehicular','flujoVehicular'],['Intensidad (1-5)','intensidad'],['Diversidad (1-5)','diversidad'],['Agrado (1-5)','agrado'],['Facilidad distinguir (1-5)','facilidad'],['N.º fuentes','nFuentes'],['Tipos de fuentes','tiposFuentes'],['N.º eventos','eventos'],['Peatones (10 min)','peatones'],['Vehículos (10 min)','vehiculos'],['Actividades','actividades'],['Fichas completadas','fichas']];
 
 FB.tablaFuentes = recs=>recs.filter(r=>r.tipo==='sonora').flatMap(r=>(r.data.fuentes||[]).filter(f=>f&&f.sonido).map((f,i)=>({
   ciudad:FB.CIUDAD,codigo:r.codigo,fecha:r.fecha,lugar:r.lugar,observador:r.observador,n:i+1,sonido:f.sonido,tipo:f.tipo||'',tipoNombre:FB.FUENTE_TIPOS[f.tipo]||'',intensidad:f.intensidad||'',eventos:num(f.eventos),patron:f.patron||'',predominante:(r.data.predominante&&r.data.predominante===f.sonido)?'sí':''})));
@@ -437,20 +466,6 @@ FB.COLS_FUENTES=[['Ciudad','ciudad'],['Código','codigo'],['Fecha','fecha'],['Lu
 FB.tablaConteos = recs=>recs.filter(r=>r.tipo==='actividades').flatMap(r=>(r.data.conteo||[]).map((c,i)=>({
   ciudad:FB.CIUDAD,codigo:r.codigo,fecha:r.fecha,lugar:r.lugar,observador:r.observador,intervalo:`${FB.pad(i*2)}–${FB.pad(i*2+2)} min`,peatones:num(c&&c.peatones),vehiculos:num(c&&c.vehiculos),nota:c&&c.nota||''})));
 FB.COLS_CONTEOS=[['Ciudad','ciudad'],['Código','codigo'],['Fecha','fecha'],['Lugar','lugar'],['Observador/a','observador'],['Intervalo','intervalo'],['Peatones','peatones'],['Vehículos','vehiculos'],['Nota','nota']];
-
-FB.tablaMapa = recs=>recs.filter(r=>r.tipo==='cartografia').flatMap(r=>{
-  let sk={}; try{sk=JSON.parse(r.data.croquis||'{}')}catch(e){}
-  const det=r.data.fuentesMapa||[];
-  return (sk.markers||[]).map((m,i)=>{const d=det[i]||{}; return {ciudad:FB.CIUDAD,codigo:r.codigo,fecha:r.fecha,lugar:r.lugar,observador:r.observador,etiqueta:m.label,tipo:m.tipo,x:+m.x.toFixed(3),y:+m.y.toFixed(3),direccion:FB.direccion(m),descripcion:d.desc||'',movimiento:d.mov||'',distancia:d.dist||''};});
-});
-FB.COLS_MAPA=[['Ciudad','ciudad'],['Código','codigo'],['Fecha','fecha'],['Lugar','lugar'],['Observador/a','observador'],['Etiqueta','etiqueta'],['Tipo','tipo'],['x (0-1)','x'],['y (0-1)','y'],['Dirección','direccion'],['Descripción','descripcion'],['Fija / móvil','movimiento'],['Distancia','distancia']];
-
-/* Dirección de una fuente respecto al observador (centro del croquis, "frente" hacia arriba) */
-FB.direccion = m=>{
-  const dx=m.x-.5, dy=.5-m.y; if(Math.hypot(dx,dy)<.06) return 'Junto al observador';
-  const a=(Math.atan2(dx,dy)*180/Math.PI+360)%360;
-  return ['Adelante','Adelante-derecha','Derecha','Atrás-derecha','Atrás','Atrás-izquierda','Izquierda','Adelante-izquierda'][Math.round(a/45)%8];
-};
 
 /* Respaldo completo (incluye fotos) */
 const b64=blob=>new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(blob);});
@@ -461,8 +476,9 @@ FB.respaldo = async ()=>{
 };
 FB.importar = async json=>{
   if(!json||json.app!=='fichas-sonoras-ba'||!Array.isArray(json.fichas)) throw new Error('El archivo no es un respaldo de esta app');
+  if(json.nota&&/simulad/i.test(json.nota)) throw new Error('son datos simulados; ya se muestran aparte y no se mezclan con los registros');
   let nuevas=0,act=0,igual=0;
-  for(const f of json.fichas){
+  for(const f of json.fichas.filter(x=>FB.TIPOS[x.tipo])){
     const cur=await FB.db.get(f.id);
     if(!cur){await FB.db.put(f);nuevas++;}
     else if((f.actualizado||0)>(cur.actualizado||0)){await FB.db.put(f);act++;}

@@ -11,20 +11,51 @@ yo.addEventListener('input',()=>{FB.settings.set({observador:yo.value.trim()});h
 hint();
 
 let filtro=s.filtro||'Todos';
+await FB.limpiarCartografia();
 
-async function render(){
-  const recs=await FB.db.all();
-  const lugares=await FB.lugaresTodos();
-
-  /* agrupar: lugar -> código -> fichas */
+/* Agrupa fichas: lugar -> código -> {sonora, actividades} */
+function agrupar(recs){
   const grupos={};
   recs.forEach(r=>{
-    const lug=r.lugar||'Sin lugar';
-    const key=r.codigo||('·'+r.id);
+    const lug=r.lugar||'Sin lugar', key=r.codigo||('·'+r.id);
     const g=(grupos[lug]=grupos[lug]||{});
     (g[key]=g[key]||{codigo:r.codigo,items:{}}).items[r.tipo]=r;
   });
-  const orden=[...lugares.filter(l=>grupos[l]),...Object.keys(grupos).filter(l=>!lugares.includes(l))];
+  return grupos;
+}
+function ordenLugares(grupos,lugares){ return [...lugares.filter(l=>grupos[l]),...Object.keys(grupos).filter(l=>!lugares.includes(l))]; }
+
+/* Lista por lugar. sim=true: enlaces de solo lectura y sin crear fichas nuevas */
+function htmlLista(grupos,orden,sim){
+  return orden.map(l=>{
+    const info=FB.lugarInfo(l);
+    const regs=Object.values(grupos[l]).map(g=>{
+      const any=g.items.sonora||g.items.actividades;
+      return {...g,any,ts:(any.fecha||'')+(any.data&&any.data.horaInicio||''),upd:Math.max(...Object.values(g.items).map(x=>x.actualizado||0))};
+    }).sort((a,b)=>b.ts.localeCompare(a.ts)||b.upd-a.upd);
+    return `<div class="lugar-group">
+      <div class="lugar-head"><div><h3>${esc(l)}</h3>${info?`<span class="hom">${esc(info.zona)} · homólogo: ${esc(info.homologo)}</span>`:''}</div><span class="count">${regs.length} ${regs.length===1?'registro':'registros'}</span></div>
+      ${regs.map(g=>{
+        const d=(g.items.sonora||g.any).data||{};
+        const meta=[FB.fechaLarga(g.any.fecha),d.horaInicio,g.any.observador].filter(Boolean).join(' · ');
+        const pills=Object.entries(FB.TIPOS).map(([t,T])=>{
+          const r=g.items[t];
+          if(r) return `<a class="pill done" href="${T.url}?${sim?'sim':'id'}=${r.id}">${T.corto}</a>`;
+          if(sim) return '';
+          const q=`?codigo=${encodeURIComponent(g.codigo||'')}&lugar=${encodeURIComponent(l==='Sin lugar'?'':l)}`;
+          return `<a class="pill todo" href="${T.url}${q}">${T.corto}</a>`;
+        }).join('');
+        const extra=g.items.sonora&&d.dbProm?` · ${esc(d.dbProm)} dB prom.`:'';
+        return `<div class="reg"><div class="reg-top"><span class="reg-code">${esc(g.codigo||'Sin código')}</span><span class="reg-meta">${esc(meta)}${extra}</span></div><div class="pills">${pills}</div></div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+async function render(){
+  const recs=(await FB.db.all()).filter(r=>FB.TIPOS[r.tipo]);
+  const lugares=await FB.lugaresTodos();
+  const grupos=agrupar(recs), orden=ordenLugares(grupos,lugares);
 
   const nReg=Object.values(grupos).reduce((s,g)=>s+Object.keys(g).length,0);
   $('#stats').innerHTML=`<span><b>${nReg}</b>registros</span><span><b>${recs.length}</b>fichas</span><span><b>${orden.length}</b>lugares</span>`;
@@ -32,32 +63,9 @@ async function render(){
   if(filtro!=='Todos'&&!orden.includes(filtro)) filtro='Todos';
   $('#filtro').innerHTML=['Todos',...orden].map(l=>`<label class="chip"><input type="radio" name="filtro" value="${esc(l)}" ${l===filtro?'checked':''}><span>${esc(l)}${l!=='Todos'?` · ${Object.keys(grupos[l]).length}`:''}</span></label>`).join('');
 
-  if(!recs.length){
-    $('#lista').innerHTML='<div class="empty">Aún no hay registros en este teléfono.<br>Empieza con una <a href="ficha-sonora.html">ficha sonora</a>.</div>';
-  } else {
-    $('#lista').innerHTML=orden.filter(l=>filtro==='Todos'||l===filtro).map(l=>{
-      const info=FB.lugarInfo(l);
-      const regs=Object.values(grupos[l]).map(g=>{
-        const any=g.items.sonora||g.items.actividades||g.items.cartografia;
-        return {...g,any,ts:(any.fecha||'')+(any.data&&any.data.horaInicio||''),upd:Math.max(...Object.values(g.items).map(x=>x.actualizado||0))};
-      }).sort((a,b)=>b.ts.localeCompare(a.ts)||b.upd-a.upd);
-      return `<div class="lugar-group">
-        <div class="lugar-head"><div><h3>${esc(l)}</h3>${info?`<span class="hom">${esc(info.zona)} · homólogo: ${esc(info.homologo)}</span>`:''}</div><span class="count">${regs.length} ${regs.length===1?'registro':'registros'}</span></div>
-        ${regs.map(g=>{
-          const d=g.any.data||{};
-          const meta=[FB.fechaLarga(g.any.fecha),d.horaInicio,g.any.observador].filter(Boolean).join(' · ');
-          const pills=Object.entries(FB.TIPOS).map(([t,T])=>{
-            const r=g.items[t];
-            if(r) return `<a class="pill done" href="${T.url}?id=${r.id}">${T.corto}</a>`;
-            const q=`?codigo=${encodeURIComponent(g.codigo||'')}&lugar=${encodeURIComponent(l==='Sin lugar'?'':l)}`;
-            return `<a class="pill todo" href="${T.url}${q}">${T.corto}</a>`;
-          }).join('');
-          const extra=g.items.sonora&&d.dbProm?` · ${esc(d.dbProm)} dB prom.`:'';
-          return `<div class="reg"><div class="reg-top"><span class="reg-code">${esc(g.codigo||'Sin código')}</span><span class="reg-meta">${esc(meta)}${extra}</span></div><div class="pills">${pills}</div></div>`;
-        }).join('')}
-      </div>`;
-    }).join('');
-  }
+  $('#lista').innerHTML = recs.length
+    ? htmlLista(grupos,orden.filter(l=>filtro==='Todos'||l===filtro),false)
+    : '<div class="empty">Aún no hay registros en este teléfono.<br>Empieza con una <a href="ficha-sonora.html">ficha sonora</a>.</div>';
 
   /* aviso de respaldo */
   const last=FB.settings.get().ultimoRespaldo||0;
@@ -67,21 +75,30 @@ async function render(){
     : `<div class="notice ok">Todo respaldado · ${new Date(last).toLocaleString('es-CL',{dateStyle:'short',timeStyle:'short'})}</div>`;
 }
 
+/* Datos simulados: se muestran aparte y no se suman a los registros */
+async function renderSim(){
+  const sims=await FB.simulados();
+  if(!sims.length){ $('#lista-sim').innerHTML='<div class="empty">No se pudieron cargar los datos simulados.</div>'; return; }
+  const lugares=await FB.lugaresTodos(); const g=agrupar(sims);
+  $('#lista-sim').innerHTML=htmlLista(g,ordenLugares(g,lugares),true);
+}
+
 $('#filtro').addEventListener('change',e=>{ filtro=e.target.value; FB.settings.set({filtro}); render(); });
 
 /* Exportaciones */
 const stamp=()=>{const d=new Date();return `${d.getFullYear()}${FB.pad(d.getMonth()+1)}${FB.pad(d.getDate())}-${FB.pad(d.getHours())}${FB.pad(d.getMinutes())}`;};
 const quien=()=>FB.iniciales(FB.settings.get().observador)||'grupo';
-async function csv(fn,cols,nombre){
-  const recs=await FB.db.all(); if(!recs.length){FB.toast('No hay fichas para exportar');return;}
+async function csv(fn,cols,nombre,fuente){
+  const recs=fuente?await fuente():(await FB.db.all()).filter(r=>FB.TIPOS[r.tipo]);
+  if(!recs.length){FB.toast('No hay fichas para exportar');return;}
   const rows=fn(recs); if(!rows.length){FB.toast('No hay datos de ese tipo todavía');return;}
-  const r=await FB.entregar(new Blob([FB.toCSV(rows,cols)],{type:'text/csv;charset=utf-8'}),`${nombre}_${quien()}_${stamp()}.csv`);
+  const r=await FB.entregar(new Blob([FB.toCSV(rows,cols)],{type:'text/csv;charset=utf-8'}),`${nombre}_${stamp()}.csv`);
   if(r!=='cancelado') FB.toast(`${rows.length} filas exportadas`);
 }
-$('#exp-general').addEventListener('click',()=>csv(FB.tablaGeneral,FB.COLS_GENERAL,'tabla-general_BA'));
-$('#exp-fuentes').addEventListener('click',()=>csv(FB.tablaFuentes,FB.COLS_FUENTES,'fuentes_BA'));
-$('#exp-conteos').addEventListener('click',()=>csv(FB.tablaConteos,FB.COLS_CONTEOS,'conteos_BA'));
-$('#exp-mapa').addEventListener('click',()=>csv(FB.tablaMapa,FB.COLS_MAPA,'cartografia_BA'));
+$('#exp-general').addEventListener('click',()=>csv(FB.tablaGeneral,FB.COLS_GENERAL,`tabla-general_BA_${quien()}`));
+$('#exp-fuentes').addEventListener('click',()=>csv(FB.tablaFuentes,FB.COLS_FUENTES,`fuentes_BA_${quien()}`));
+$('#exp-conteos').addEventListener('click',()=>csv(FB.tablaConteos,FB.COLS_CONTEOS,`conteos_BA_${quien()}`));
+$('#exp-sim').addEventListener('click',()=>csv(FB.tablaGeneral,FB.COLS_GENERAL,'tabla-general_BA_simulado-prototipo',FB.simulados));
 $('#exp-json').addEventListener('click',async()=>{
   const recs=await FB.db.all(); if(!recs.length){FB.toast('No hay fichas para respaldar');return;}
   const data=await FB.respaldo();
@@ -92,10 +109,11 @@ $('#imp').addEventListener('change',async e=>{
   let tot={nuevas:0,act:0,igual:0};
   for(const f of e.target.files){
     try{ const r=await FB.importar(JSON.parse(await f.text())); tot.nuevas+=r.nuevas; tot.act+=r.act; tot.igual+=r.igual; }
-    catch(err){ FB.toast(`${f.name}: ${err.message}`,3500); }
+    catch(err){ FB.toast(`${f.name}: ${err.message}`,4000); }
   }
   e.target.value='';
-  FB.toast(`Importadas: ${tot.nuevas} nuevas · ${tot.act} actualizadas · ${tot.igual} sin cambios`,3500);
+  await FB.limpiarCartografia();
+  if(tot.nuevas||tot.act||tot.igual) FB.toast(`Importadas: ${tot.nuevas} nuevas · ${tot.act} actualizadas · ${tot.igual} sin cambios`,3500);
   render();
 });
 
@@ -109,6 +127,6 @@ $('#imp').addEventListener('change',async e=>{
   }catch(e){}
 })();
 
-render();
+render(); renderSim();
 window.addEventListener('pageshow',e=>{ if(e.persisted) render(); });
 })();

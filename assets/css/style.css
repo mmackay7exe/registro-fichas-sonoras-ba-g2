@@ -105,7 +105,7 @@ input::placeholder,textarea::placeholder{color:#A6ADB5}
 .tipo .go{font-size:1.4rem;color:var(--navy)}
 .tipo:hover h3{color:var(--navy)}
 @media (min-width:760px){
-  .tipos{grid-template-columns:repeat(3,1fr);border-top:0;gap:1rem}
+  .tipos{grid-template-columns:repeat(2,1fr);border-top:0;gap:1rem}
   .tipo{grid-template-columns:1fr;align-content:start;border:1px solid var(--line);border-top:2px solid var(--line-strong);padding:1.1rem;min-height:170px}
   .tipo .go{justify-self:end;align-self:end}
 }
@@ -220,3 +220,7 @@ table.grid .num input{text-align:center}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
 @media print{.topbar,.timer,.ficha-foot,.site-foot{display:none}}
+
+#referencias table.grid td{padding:.5rem .3rem;font-size:.84rem;vertical-align:top}
+#referencias sup{color:var(--terra)}
+#simulados .reg-code{color:var(--muted)}

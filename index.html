@@ -36,7 +36,6 @@
     <nav class="tipos" aria-label="Tipos de ficha">
       <a class="tipo" href="ficha-sonora.html"><span class="n">01</span><div><h3>Ficha de observación sonora</h3><p>Fuentes, intensidad, patrón, dB y evaluación del ambiente. Empieza por aquí.</p></div><span class="go">→</span></a>
       <a class="tipo" href="ficha-actividades.html"><span class="n">02</span><div><h3>Actividades humanas</h3><p>Conteo de peatones y vehículos cada 2 min y actividades del entorno.</p></div><span class="go">→</span></a>
-      <a class="tipo" href="cartografia.html"><span class="n">03</span><div><h3>Cartografía sonora y espacial</h3><p>Croquis con la ubicación de las fuentes y la condición del espacio.</p></div><span class="go">→</span></a>
     </nav>
     <a class="guia-link" href="guia.html"><div><b>Guía y procedimiento</b><span class="small muted">Antes de salir, protocolo en terreno, códigos y cómo juntar los datos del grupo.</span></div><span class="go">→</span></a>
   </section>
@@ -46,6 +45,35 @@
     <div class="stat-line" id="stats"></div>
     <div class="filter chips" id="filtro" role="radiogroup" aria-label="Filtrar por lugar"></div>
     <div id="lista"><div class="empty">Cargando…</div></div>
+  </section>
+
+  <section class="block" id="simulados">
+    <p class="eyebrow">Prototipo</p>
+    <div class="notice">Datos simulados para el prototipo</div>
+    <div id="lista-sim"><div class="empty">Cargando…</div></div>
+    <div class="btn-row" style="margin-top:.8rem"><button type="button" class="btn small ghost" id="exp-sim">Tabla general simulada (CSV)</button></div>
+  </section>
+
+  <section class="block" id="referencias">
+    <p class="eyebrow">Referencias externas · mediciones públicas</p>
+    <p class="small muted" style="margin-top:0">Valores publicados para el entorno de los puntos de estudio. Son promedios de mapas de ruido (sobre todo tránsito), no momentos de 10 minutos: sirven para contrastar, no para comparar uno a uno.</p>
+    <table class="grid">
+      <thead><tr><th>Entorno</th><th>Período</th><th>Nivel</th><th>Fuente</th></tr></thead>
+      <tbody>
+        <tr><td>Calles que rodean Plaza de Mayo</td><td>Día</td><td class="mono">&gt; 80 dB</td><td>Mapa Estratégico de Ruido, GCBA, 2006 <sup>1</sup></td></tr>
+        <tr><td>Av. Madero / Huergo (borde de Puerto Madero)</td><td>Día</td><td class="mono">&gt; 80 dB</td><td>Mapa Estratégico de Ruido, 2006 <sup>1</sup></td></tr>
+        <tr><td>Calle Defensa (San Telmo)</td><td>Día</td><td class="mono">70–75 dB</td><td>Mapa Estratégico de Ruido, 2006 <sup>1</sup></td></tr>
+        <tr><td>Grandes avenidas del centro (incl. Av. de Mayo)</td><td>Día</td><td class="mono">75–85 dB</td><td>Mapa de Ruido APrA <sup>2 3</sup></td></tr>
+        <tr><td>Avenidas / calles internas</td><td>Noche</td><td class="mono">−5 a −10 / hasta −15 dB</td><td>Mapa Estratégico de Ruido, 2006 <sup>1</sup></td></tr>
+        <tr><td>Límite Ley 1.540 (zona residencial / comercial)</td><td>Día</td><td class="mono">65 / 70 dB</td><td>Ley 1.540 <sup>4</sup></td></tr>
+      </tbody>
+    </table>
+    <ol class="small muted" style="padding-left:1.1rem;margin:.8rem 0 0">
+      <li><a href="https://www.notife.com/primer-mapa-de-contaminacion-sonora-en-la-ciudad-de-buenos-aires">Notife, “Primer mapa de contaminación sonora…” (2006)</a></li>
+      <li><a href="https://buenosaires.gob.ar/impacto-acustico/mapa-de-ruido">Gobierno de la Ciudad, Mapa de Ruido (informe final 2020)</a></li>
+      <li><a href="https://www.perfil.com/noticias/sociedad/cuales-son-los-barrios-mas-ruidosos-de-caba-y-donde-todavia-sobreviven-las-calles-silenciosas.phtml">Perfil, “El ranking del ruido” (2026)</a></li>
+      <li><a href="https://www.infobae.com/2016/05/02/1808490-mucho-ruido-y-las-nueces/">Infobae, “Mucho ruido y las nueces” (2016)</a></li>
+    </ol>
   </section>
 
   <section class="block" id="datos">
@@ -60,7 +88,6 @@
       <div class="btn-row" style="margin:.8rem 0">
         <button type="button" class="btn small ghost" id="exp-fuentes">Fuentes (CSV)</button>
         <button type="button" class="btn small ghost" id="exp-conteos">Conteos (CSV)</button>
-        <button type="button" class="btn small ghost" id="exp-mapa">Cartografía (CSV)</button>
       </div>
       <p class="small muted">Para juntar los datos del grupo, importa aquí los respaldos (.json) de cada integrante. Las fichas repetidas no se duplican: se conserva la versión más reciente.</p>
       <span class="btn small file-btn">Importar respaldo (.json)<input type="file" id="imp" accept=".json,application/json" multiple></span>

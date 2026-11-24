@@ -36,10 +36,16 @@ FB.updateNext = rec=>{
   $$('[data-next]').forEach(a=>{ a.href=a.dataset.next+q; });
 };
 FB.wireNext = async rec=>{
+  if(FB.page&&FB.page.sim){
+    const sims=rec?(await FB.simulados()).filter(r=>r.codigo===rec.codigo):[];
+    $$('[data-next]').forEach(a=>{ const ex=sims.find(r=>r.tipo===a.dataset.tipo);
+      if(ex){ a.href=`${FB.TIPOS[ex.tipo].url}?sim=${ex.id}`; a.textContent=`Ver · ${FB.TIPOS[ex.tipo].nombre} →`; } else a.classList.add('hidden'); });
+    return;
+  }
   // si ya existe la ficha enlazada, abrirla en vez de crear otra
   const recs=rec&&rec.codigo?(await FB.db.all()).filter(r=>r.codigo===rec.codigo):[];
   $$('[data-next]').forEach(a=>{
-    const tipo=a.dataset.tipo, ex=recs.find(r=>r.tipo===tipo);
+    const tipo=a.dataset.tipo; if(!FB.TIPOS[tipo]){a.classList.add('hidden');return;} const ex=recs.find(r=>r.tipo===tipo);
     if(ex){ a.href=`${FB.TIPOS[tipo].url}?id=${ex.id}`; a.textContent=`Abrir · ${FB.TIPOS[tipo].nombre} →`; }
     else if(rec){ a.href=`${FB.TIPOS[tipo].url}?codigo=${encodeURIComponent(rec.codigo||'')}&lugar=${encodeURIComponent(rec.lugar||'')}`; }
   });

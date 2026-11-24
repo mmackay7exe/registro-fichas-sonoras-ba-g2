@@ -1,12 +1,12 @@
 /* Service worker: guarda la app completa para usarla sin conexión.
    Cambia VERSION cada vez que publiques cambios para que los teléfonos se actualicen. */
-const VERSION = 'fichas-ba-v1';
+const VERSION = 'fichas-ba-v2';
 const ARCHIVOS = [
-  './', 'index.html', 'ficha-sonora.html', 'ficha-actividades.html', 'cartografia.html', 'guia.html',
-  'manifest.webmanifest',
+  './', 'index.html', 'ficha-sonora.html', 'ficha-actividades.html', 'guia.html',
+  'manifest.webmanifest', 'data/simulado-prototipo.json',
   'assets/css/style.css',
   'assets/js/core.js', 'assets/js/ficha-comun.js', 'assets/js/home.js',
-  'assets/js/sonora.js', 'assets/js/actividades.js', 'assets/js/cartografia.js',
+  'assets/js/sonora.js', 'assets/js/actividades.js',
   'assets/img/logo.webp', 'assets/img/icon-192.png', 'assets/img/icon-512.png',
   'assets/img/icon-maskable-512.png', 'assets/img/apple-touch-icon.png'
 ];

@@ -11,15 +11,16 @@ Funciona sin conexión. Hay que abrir el link una vez con internet; después de 
 | `index.html` | Inicio: tipos de ficha, registros agrupados por lugar, respaldo y exportación |
 | `ficha-sonora.html` | 01 Ficha de observación sonora (con cronómetro de 10 min) |
 | `ficha-actividades.html` | 02 Registro de actividades humanas (conteo por intervalos de 2 min) |
-| `cartografia.html` | 03 Cartografía sonora y espacial (croquis interactivo) |
 | `guia.html` | Guía y procedimiento |
 
 ## Datos
 
 - Todo se guarda en el navegador de cada teléfono (IndexedDB) a medida que se escribe. Las fotos se comprimen antes de guardarse.
-- **Respaldo completo (.json)**: incluye todas las fichas, fotos y croquis. Sirve para juntar los datos del grupo con *Importar respaldo*.
+- **Respaldo completo (.json)**: incluye todas las fichas y fotos. Sirve para juntar los datos del grupo con *Importar respaldo*.
 - **Tabla general (CSV)**: una fila por registro (código), compatible con la tabla de Valparaíso.
-- Además hay CSV de fuentes, conteos y cartografía.
+- Además hay CSV de fuentes y de conteos.
+- `data/simulado-prototipo.json`: datos simulados para el prototipo. Se muestran aparte en el inicio, en solo lectura, y no se suman a los registros ni se pueden importar.
+- El inicio incluye una tabla breve de referencias externas (mapas de ruido públicos de Buenos Aires) con sus fuentes.
 
 ## Publicar con GitHub Pages
 
