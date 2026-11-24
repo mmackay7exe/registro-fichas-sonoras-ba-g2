@@ -1,6 +1,6 @@
 /* Service worker: guarda la app completa para usarla sin conexión.
    Cambia VERSION cada vez que publiques cambios para que los teléfonos se actualicen. */
-const VERSION = 'fichas-ba-v3';
+const VERSION = 'fichas-ba-v4';
 const ARCHIVOS = [
   './', 'index.html', 'ficha-sonora.html', 'ficha-actividades.html', 'guia.html',
   'manifest.webmanifest', 'data/registros-ba.json',
@@ -22,20 +22,24 @@ self.addEventListener('activate', e => {
   );
 });
 
-/* Primero la copia guardada (rápido y sin conexión); en paralelo se actualiza si hay red. */
+/* Primero la red, para mostrar siempre la versión publicada; si no hay conexión
+   (o tarda más de 4 s), se usa la copia guardada. */
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
   e.respondWith((async () => {
     const cache = await caches.open(VERSION);
-    const hit = await cache.match(req, { ignoreSearch: true });
-    const red = fetch(req).then(res => {
+    const red = fetch(req, { cache: 'no-cache' }).then(res => {
       if (res && res.ok) cache.put(req.url.split('?')[0], res.clone());
       return res;
     }).catch(() => null);
+    const espera = new Promise(r => setTimeout(() => r(null), 4000));
+    const res = await Promise.race([red, espera]);
+    if (res && res.ok) return res;
+    const hit = await cache.match(req, { ignoreSearch: true });
     if (hit) { e.waitUntil(red); return hit; }
-    const res = await red;
-    if (res) return res;
+    const tarde = await red;
+    if (tarde) return tarde;
     if (req.mode === 'navigate') return (await cache.match('index.html')) || Response.error();
     return Response.error();
   })());
