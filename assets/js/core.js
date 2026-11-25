@@ -21,7 +21,7 @@ FB.REG_URL = 'data/registros-ba.json';
 /* Origen de cada registro */
 FB.ORIGEN = {
   terreno:      {corto:'Terreno',      texto:'Registro medido en terreno.'},
-  reconstruido: {corto:'Reconstruido', texto:'Registro reconstruido: se guía en referencias y en lo observado en el lugar, pero sus valores no se midieron en terreno en ese momento. Sirve para comparar, no como medición.'}
+  reconstruido: {corto:'Reconstruido', texto:'Registro reconstruido: la observación no se alcanzó a completar en terreno en ese momento; se completó después a partir de lo vivido en el lugar, de la experiencia previa del grupo y de otros datos (referencias publicadas). Sirve para comparar, no como medición.'}
 };
 FB.FUENTE_TIPOS = {H:'Humana',V:'Vehicular',C:'Comercial',N:'Natural',M:'Mecánica',O:'Otra'};
 FB.FUENTE_COLORES = {H:'#B3624E',V:'#0B294A',C:'#C9962B',N:'#2E7D5B',M:'#6B7480',O:'#8A5BA6'};

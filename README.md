@@ -21,7 +21,7 @@ Funciona sin conexión. Hay que abrir el link una vez con internet; después de 
 - Además hay CSV de fuentes y de conteos.
 - `data/registros-ba.json`: los registros recopilados por el grupo en Buenos Aires (8 registros, 16 fichas). Se muestran en el inicio, en solo lectura. Cada ficha tiene un campo `origen`:
   - `terreno` (BA-M-02, BA-PI-01): medido en el lugar.
-  - `reconstruido` (BA-M-11, BA-M-12, BA-M-13, BA-M-14, BA-PI-11, BA-PI-12): se guía en referencias y en lo observado en el lugar, pero sus valores no se midieron en terreno en ese momento. Sirve para comparar, no como medición.
+  - `reconstruido` (BA-M-12, BA-M-13, BA-M-14, BA-M-15, BA-PI-12, BA-PI-13): la observación no se alcanzó a completar en terreno en ese momento; se completó después a partir de lo vivido en el lugar, de la experiencia previa del grupo y de otros datos (referencias publicadas). Sirve para comparar, no como medición.
 - La tabla general (CSV) incluye la columna **Origen**.
 - El inicio incluye una tabla breve de referencias externas (mapas de ruido públicos de Buenos Aires) con sus fuentes.
 
