@@ -65,7 +65,7 @@ async function render(){
 
   $('#lista').innerHTML = recs.length
     ? htmlLista(grupos,orden.filter(l=>filtro==='Todos'||l===filtro),false)
-    : '<div class="empty">Aún no hay registros en este teléfono.<br>Empieza con una <a href="ficha-sonora.html">ficha sonora</a>.</div>';
+    : '<div class="empty">Aún no hay registros en este dispositivo.<br>Empieza con una <a href="ficha-sonora.html">ficha sonora</a>.</div>';
 
   /* aviso de respaldo */
   const last=FB.settings.get().ultimoRespaldo||0;

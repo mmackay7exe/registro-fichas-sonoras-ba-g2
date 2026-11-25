@@ -1,6 +1,6 @@
 /* Service worker: guarda la app completa para usarla sin conexión.
    Cambia VERSION cada vez que publiques cambios para que los teléfonos se actualicen. */
-const VERSION = 'fichas-ba-v4';
+const VERSION = 'fichas-ba-v5';
 const ARCHIVOS = [
   './', 'index.html', 'ficha-sonora.html', 'ficha-actividades.html', 'guia.html',
   'manifest.webmanifest', 'data/registros-ba.json',
@@ -17,7 +17,7 @@ self.addEventListener('install', e => {
 
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION).map(k => caches.delete(k))))
+    caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION && k !== VERSION + '-fuentes').map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -26,7 +26,20 @@ self.addEventListener('activate', e => {
    (o tarda más de 4 s), se usa la copia guardada. */
 self.addEventListener('fetch', e => {
   const req = e.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  /* Tipografías de Google Fonts: se guardan la primera vez para que se vean sin conexión */
+  if (url.origin === 'https://fonts.googleapis.com' || url.origin === 'https://fonts.gstatic.com') {
+    e.respondWith(caches.open(VERSION + '-fuentes').then(async c => {
+      const hit = await c.match(req);
+      if (hit) return hit;
+      const res = await fetch(req);
+      if (res && (res.ok || res.type === 'opaque')) c.put(req, res.clone());
+      return res;
+    }).catch(() => Response.error()));
+    return;
+  }
+  if (url.origin !== location.origin) return;
   e.respondWith((async () => {
     const cache = await caches.open(VERSION);
     const red = fetch(req, { cache: 'no-cache' }).then(res => {
